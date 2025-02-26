@@ -1,16 +1,11 @@
 
 package org.example.letersi.services;
 
-import com.google.gson.Gson;
 import org.example.letersi.domain.Book;
 
-import javax.ws.rs.core.Response;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-
-import static org.example.letersi.services.AbstractService.getConnection;
 
 
 public class BooksService extends AbstractService {
@@ -19,17 +14,16 @@ public class BooksService extends AbstractService {
         Connection con = getConnection();
         PreparedStatement statement = null;
         try {
-           String sql = "INSERT INTO books (id, title, isbn, genre_id, author_id, score) VALUES (?,?,?,?,?,?)";
-           statement = con.prepareStatement(sql);
-           statement.setInt(1, book.getId());
-           statement.setString(2, book.getTitle());
-           statement.setString(3, book.getIsbn());
-           statement.setInt(4,book.getGenreId());
-           statement.setInt(5, book.getAuthorId());
-           statement.setDouble(6, book.getScore());
-           statement.executeUpdate();
-        }
-        finally {
+            String sql = "INSERT INTO books (id, title, isbn, genre_id, author_id, score) VALUES (?,?,?,?,?,?)";
+            statement = con.prepareStatement(sql);
+            statement.setInt(1, book.getId());
+            statement.setString(2, book.getTitle());
+            statement.setString(3, book.getIsbn());
+            statement.setInt(4, book.getGenreId());
+            statement.setInt(5, book.getAuthorId());
+            statement.setDouble(6, book.getScore());
+            statement.executeUpdate();
+        } finally {
             if (statement != null) {
                 statement.close();
             }
@@ -39,12 +33,10 @@ public class BooksService extends AbstractService {
         }
     }
 
-    public void insertBulk(String jsonBooks) throws Exception {
+    public void insertBulk(List<Book> books) throws Exception {
         Connection con = getConnection();
         PreparedStatement statement = null;
         try {
-            Gson gson = new Gson();
-            List<Book> books = gson.fromJson(jsonBooks, List.class);
             String sql = "INSERT INTO books (id, title, isbn, genre_id, author_id, score) VALUES (?,?,?,?,?,?)";
             statement = con.prepareStatement(sql);
             con.setAutoCommit(false);
@@ -59,11 +51,11 @@ public class BooksService extends AbstractService {
             }
             statement.executeBatch();
             con.commit();
-        } catch (SQLException e) {
+        } catch (Exception e) {
             if (con != null) {
                 con.rollback();
             }
-            throw new Exception("Error inserting books", e);
+            throw e;
         } finally {
             if (statement != null) {
                 statement.close();
@@ -77,7 +69,7 @@ public class BooksService extends AbstractService {
     public void deleteBook(int id) throws Exception {
         Connection con = getConnection();
         PreparedStatement statement = null;
-        try{
+        try {
             String sql = "DELETE FROM books WHERE id = ?";
             statement = con.prepareStatement(sql);
             statement.setInt(1, id);
@@ -101,7 +93,7 @@ public class BooksService extends AbstractService {
             statement = con.createStatement();
             String sql = "SELECT * FROM books";
             resultset = statement.executeQuery(sql);
-            while(resultset.next()) {
+            while (resultset.next()) {
                 Book book = new Book();
                 book.setId(resultset.getInt("id"));
                 book.setTitle(resultset.getString("title"));
@@ -134,7 +126,7 @@ public class BooksService extends AbstractService {
             statement.setInt(1, id);
             resultset = statement.executeQuery();
 
-            if(resultset.next()) {
+            if (resultset.next()) {
                 book = new Book();
                 book.setId(resultset.getInt("id"));
                 book.setTitle(resultset.getString("title"));
@@ -144,9 +136,8 @@ public class BooksService extends AbstractService {
                 book.setScore(resultset.getDouble("score"));
             }
 
-        }
-        finally {
-            if (statement != null){
+        } finally {
+            if (statement != null) {
                 statement.close();
             }
             if (con != null) {

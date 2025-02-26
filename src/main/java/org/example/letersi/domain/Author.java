@@ -1,9 +1,12 @@
 package org.example.letersi.domain;
 
+import java.util.List;
+
 public class Author {
     private int id;
     private String name;
     private int noOfBooks;
+    private List<Book> books;
 
     public Author() {
     }
@@ -30,5 +33,13 @@ public class Author {
     }
     public void setNoOfBooks(int noOfBooks) {
         this.noOfBooks = noOfBooks;
+    }
+
+    public void setBooks(List<Book> books) {
+        this.books = books;
+    }
+
+    public List<Book> getBooks() {
+        return books;
     }
 }

@@ -1,6 +1,7 @@
 package org.example.letersi.resources.books;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import org.example.letersi.domain.Author;
 import org.example.letersi.domain.Book;
 import org.example.letersi.services.BooksService;
@@ -9,6 +10,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.sql.SQLException;
+import java.util.List;
 
 
 @Path("/books")
@@ -43,14 +45,23 @@ public class BooksResource {
         return Response.status(Response.Status.CREATED).build();
     }
 
+//    @POST
+//    @Path("/bulk")
+//    public Response insertBookBulk(String payload) throws Exception {
+//        booksService.insertBulk(new Gson().fromJson(payload, Book.class));
+//        return Response.status(Response.Status.CREATED).build();
+//    }
+
     @POST
     @Path("/bulk")
-    @Consumes(MediaType.APPLICATION_JSON) // This tells JAX-RS to consume JSON data
-    @Produces(MediaType.APPLICATION_JSON)
     public Response insertBookBulk(String payload) throws Exception {
-        booksService.insertBulk(new Gson().fromJson(payload, Book.class));
+        // Deserialize the payload into a List<Book>
+        List<Book> books = new Gson().fromJson(payload, new TypeToken<List<Book>>(){}.getType());
+        // Call the insertBulk method with the List<Book>
+        booksService.insertBulk(books);
         return Response.status(Response.Status.CREATED).build();
     }
+
 
     @GET
     @Path("/books")
